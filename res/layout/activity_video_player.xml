@@ -5,6 +5,12 @@
     android:layout_height="match_parent"
     android:background="@color/transparent_black_85">
 
+    <ImageView
+        android:id="@+id/iv_screenshot"
+        android:layout_width="120dp"
+        android:layout_height="80dp"
+        android:background="#34B9E4" />
+
     <com.yixia.camera.demo.ui.widget.SurfaceVideoView
         android:id="@+id/videoview"
         android:layout_width="match_parent"

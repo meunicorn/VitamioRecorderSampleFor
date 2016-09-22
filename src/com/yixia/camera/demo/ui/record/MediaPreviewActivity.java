@@ -318,74 +318,6 @@ public class MediaPreviewActivity extends BaseActivity implements OnClickListene
         }
     };
     /**
-     * 在线主题点击事件
-     */
-    private OnClickListener mThemeDownloadClickListener = new OnClickListener() {
-
-        @Override
-        public void onClick(final View v) {
-            final VideoEffectModel theme = (VideoEffectModel) v.getTag();
-
-            if (theme == null) {
-                return;
-            }
-
-            if (videoFuncList != null && videoFuncList.effectFuncModels != null && videoFuncList.effectFuncModels.size() > 0) {
-                for (VideoEffectFuncModel videoEffectFuncModel : (ArrayList<VideoEffectFuncModel>) videoFuncList.effectFuncModels) {
-                    if (videoEffectFuncModel != null && videoEffectFuncModel.currentEffectModels != null && videoEffectFuncModel.currentEffectModels.size() > 0) {
-                        for (VideoEffectModel effect : (ArrayList<VideoEffectModel>) videoEffectFuncModel.currentEffectModels) {
-                            if (effect.effectName.equalsIgnoreCase(theme.effectName)) {
-                                ToastUtils.showToast(MediaPreviewActivity.this, "主题已存在");
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (videoProcessEngine.isDownloadedTheme(theme)) {
-                // processTheme(theme);
-                addThemeItem(videoProcessEngine.addThemeToList(theme), -1);
-                mLinearLayout.setVisibility(View.GONE);
-                return;
-            }
-
-            videoProcessEngine.downloadEffectAsset(VideoEffectFuncModel.THEME_TYPE_MV, theme.effectID, new OnAssetDownloadListener() {
-
-                @Override
-                public void onSuccess() {
-                }
-
-                @Override
-                public void onProgressChanged(int progress) {
-                    theme.downloadProgress = progress;
-                    theme.downloadStatus = VideoEffectModel$DownloadStatus.DOWNLOADING;
-                }
-
-                @Override
-                public void onFailed(int errorCode) {
-
-                    if (MediaPreviewActivity.this != null) {
-                        ToastUtils.showToast(MediaPreviewActivity.this, R.string.download_error + " errorCode");
-                    }
-                }
-
-                @Override
-                public void onSuccess(final VideoEffectModel videoEffectModel) {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            ToastUtils.showToast(v.getContext(), "下载成功");
-                            // addThemeItem(videoEffectModel, -1);
-                            addThemeItem(videoProcessEngine.addThemeToList(videoEffectModel), mThemes.getChildCount() - 1);
-                        }
-                    });
-
-                }
-            });
-
-        }
-    };
-    /**
      * 响应主题点击事件
      */
     private OnClickListener mThemeClickListener = new OnClickListener() {
@@ -450,6 +382,74 @@ public class MediaPreviewActivity extends BaseActivity implements OnClickListene
 
                             theme.copyTheme(videoEffectModel);
                             refreshThemeView((ThemeView) v, theme);
+                        }
+                    });
+
+                }
+            });
+
+        }
+    };
+    /**
+     * 在线主题点击事件
+     */
+    private OnClickListener mThemeDownloadClickListener = new OnClickListener() {
+
+        @Override
+        public void onClick(final View v) {
+            final VideoEffectModel theme = (VideoEffectModel) v.getTag();
+
+            if (theme == null) {
+                return;
+            }
+
+            if (videoFuncList != null && videoFuncList.effectFuncModels != null && videoFuncList.effectFuncModels.size() > 0) {
+                for (VideoEffectFuncModel videoEffectFuncModel : (ArrayList<VideoEffectFuncModel>) videoFuncList.effectFuncModels) {
+                    if (videoEffectFuncModel != null && videoEffectFuncModel.currentEffectModels != null && videoEffectFuncModel.currentEffectModels.size() > 0) {
+                        for (VideoEffectModel effect : (ArrayList<VideoEffectModel>) videoEffectFuncModel.currentEffectModels) {
+                            if (effect.effectName.equalsIgnoreCase(theme.effectName)) {
+                                ToastUtils.showToast(MediaPreviewActivity.this, "主题已存在");
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (videoProcessEngine.isDownloadedTheme(theme)) {
+                // processTheme(theme);
+                addThemeItem(videoProcessEngine.addThemeToList(theme), -1);
+                mLinearLayout.setVisibility(View.GONE);
+                return;
+            }
+
+            videoProcessEngine.downloadEffectAsset(VideoEffectFuncModel.THEME_TYPE_MV, theme.effectID, new OnAssetDownloadListener() {
+
+                @Override
+                public void onSuccess() {
+                }
+
+                @Override
+                public void onProgressChanged(int progress) {
+                    theme.downloadProgress = progress;
+                    theme.downloadStatus = VideoEffectModel$DownloadStatus.DOWNLOADING;
+                }
+
+                @Override
+                public void onFailed(int errorCode) {
+
+                    if (MediaPreviewActivity.this != null) {
+                        ToastUtils.showToast(MediaPreviewActivity.this, R.string.download_error + " errorCode");
+                    }
+                }
+
+                @Override
+                public void onSuccess(final VideoEffectModel videoEffectModel) {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            ToastUtils.showToast(v.getContext(), "下载成功");
+                            // addThemeItem(videoEffectModel, -1);
+                            addThemeItem(videoProcessEngine.addThemeToList(videoEffectModel), mThemes.getChildCount() - 1);
                         }
                     });
 
@@ -1314,7 +1314,8 @@ public class MediaPreviewActivity extends BaseActivity implements OnClickListene
             super.onPostExecute(result);
             hideProgress();
             mStartEncoding = false;
-            startActivity(new Intent(MediaPreviewActivity.this, VideoPlayerActivity.class).putExtra(Constant.RECORD_VIDEO_PATH, mVideoPath).putExtra(Constant.RECORD_VIDEO_CAPTURE, mCoverPath));
+//TODO:这里暂时替换为自己测试的页面            startActivity(new Intent(MediaPreviewActivity.this, VideoPlayerActivity.class).putExtra(Constant.RECORD_VIDEO_PATH, mVideoPath).putExtra(Constant.RECORD_VIDEO_CAPTURE, mCoverPath));
+            startActivity(new Intent(MediaPreviewActivity.this, ScreenShotActivity.class).putExtra(Constant.RECORD_VIDEO_PATH, mVideoPath).putExtra(Constant.RECORD_VIDEO_CAPTURE, mCoverPath).putExtra("duration", mMediaObject.getDuration()));
             finish();
         }
 

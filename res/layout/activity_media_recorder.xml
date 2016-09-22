@@ -57,7 +57,6 @@
     </LinearLayout>
 
 
-
     <RelativeLayout
         android:id="@+id/camera_layout"
         android:layout_width="match_parent"
@@ -96,6 +95,30 @@
         android:layout_below="@+id/title_layout"
         android:layout_marginTop="300dip"
         android:background="#1a1825">
+
+        <RadioGroup
+            android:id="@+id/rg_option"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_10second"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="10秒MV"
+                android:textColor="#ffffff" />
+
+            <RadioButton
+                android:id="@+id/rb_5minute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5分钟"
+                android:textColor="#ffffff" />
+        </RadioGroup>
 
         <com.yixia.camera.demo.ui.record.views.ProgressView
             android:id="@+id/record_progress"

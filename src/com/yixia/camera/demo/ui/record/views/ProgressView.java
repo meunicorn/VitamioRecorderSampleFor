@@ -222,6 +222,15 @@ public class ProgressView extends View {
     public void setMaxDuration(int duration) {
         this.mMaxDuration = duration;
     }
+//
+//    public int getDuration() {
+//        if (mMediaObject != null) {
+//            return mMediaObject.getDuration();
+//        } else {
+//            //如果没有初始化，说明为0
+//            return 0;
+//        }
+//    }
 
     public void start() {
         mProgressChanged = true;
