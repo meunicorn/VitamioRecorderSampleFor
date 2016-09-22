@@ -22,6 +22,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -52,9 +54,13 @@ import java.util.ArrayList;
 public class MediaRecorderActivity extends BaseActivity implements com.yixia.weibo.sdk.MediaRecorderBase$OnErrorListener, OnClickListener, com.yixia.weibo.sdk.MediaRecorderBase$OnPreparedListener, com.yixia.weibo.sdk.MediaRecorderBase$OnEncodeListener {
 
     /**
-     * 录制最长时间
+     * 10秒MV
      */
-    public final static int RECORD_TIME_MAX = 10 * 1000;
+    public final static int RECORD_10SECOND = 10 * 1000;
+    /**
+     * 5分钟短片
+     */
+    public final static int RECORD_5MINUTE = 5 * 60 * 1000;
     /**
      * 录制最小时间
      */
@@ -71,6 +77,16 @@ public class MediaRecorderActivity extends BaseActivity implements com.yixia.wei
      * 对焦
      */
     private static final int HANDLE_HIDE_RECORD_FOCUS = 2;
+    /**
+     * 录制最长时间
+     */
+    public static int RECORD_TIME_MAX = RECORD_10SECOND;
+    /**
+     * 模式选择（暂时用radioGroup取代切换效果）
+     */
+    private RadioGroup rgOption;
+    private RadioButton rb10Second;
+    private RadioButton rb5Minute;
 
     /**
      * 下一步
@@ -165,10 +181,19 @@ public class MediaRecorderActivity extends BaseActivity implements com.yixia.wei
                     break;
                 case HANDLE_INVALIDATE_PROGRESS:
                     if (mMediaRecorder != null && !isFinishing()) {
-                        if (mProgressView != null)
+                        if (mProgressView != null) {
                             mProgressView.invalidate();
+                        }
                         //					if (mPressedStatus)
                         //						titleText.setText(String.format("%.1f", mMediaRecorder.getDuration() / 1000F));
+                        if (mMediaObject != null) {
+                            if (mMediaObject.getDuration() >= 0) {
+                                rgOption.setVisibility(View.GONE);
+                            } else {
+                                rgOption.setVisibility(View.VISIBLE);
+                            }
+                        }
+
                         if (mPressedStatus)
                             sendEmptyMessageDelayed(0, 30);
                     }
@@ -303,6 +328,23 @@ public class MediaRecorderActivity extends BaseActivity implements com.yixia.wei
         mRecordLed = (CheckBox) findViewById(R.id.record_camera_led);
         mImportVideo = (ImageView) findViewById(R.id.importVideo_btn);
         mImportVideo.setOnClickListener(this);
+
+        rgOption = (RadioGroup) findViewById(R.id.rg_option);
+        rb5Minute = (RadioButton) findViewById(R.id.rb_5minute);
+        rb10Second = (RadioButton) findViewById(R.id.rb_10second);
+
+        rgOption.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                if (i == R.id.rb_5minute) {
+                    RECORD_TIME_MAX = RECORD_5MINUTE;
+                } else if (i == R.id.rb_10second) {
+                    RECORD_TIME_MAX = RECORD_10SECOND;
+                }
+                mProgressView.setMaxDuration(RECORD_TIME_MAX);
+            }
+        });
+
         // ~~~ 绑定事件
         if (DeviceUtils.hasICS()) {
             mSurfaceView.setOnTouchListener(mOnSurfaveViewTouchListener);
@@ -311,8 +353,8 @@ public class MediaRecorderActivity extends BaseActivity implements com.yixia.wei
         mTitleNext.setOnClickListener(this);
         findViewById(R.id.title_back).setOnClickListener(this);
         mRecordDelete.setOnClickListener(this);
-        mBottomLayout.setOnTouchListener(mOnVideoControllerTouchListener);
-
+//        mBottomLayout.setOnTouchListener(mOnVideoControllerTouchListener);
+        mRecordController.setOnTouchListener(mOnVideoControllerTouchListener);
         // ~~~ 设置数据
 
         //是否支持前置摄像头
@@ -334,8 +376,7 @@ public class MediaRecorderActivity extends BaseActivity implements com.yixia.wei
         } catch (OutOfMemoryError e) {
             Logger.e(e);
         }
-
-        mProgressView.setMaxDuration(RECORD_TIME_MAX);
+        mProgressView.setMaxDuration(RECORD_TIME_MAX); //设置默认
         initSurfaceView();
     }
 
@@ -541,6 +582,7 @@ public class MediaRecorderActivity extends BaseActivity implements com.yixia.wei
             mHandler.sendEmptyMessageDelayed(HANDLE_STOP_RECORD, RECORD_TIME_MAX - mMediaObject.getDuration());
         }
         mRecordDelete.setVisibility(View.GONE);
+        rgOption.setVisibility(View.GONE);
         mCameraSwitch.setEnabled(false);
         mRecordLed.setEnabled(false);
     }
@@ -686,10 +728,11 @@ public class MediaRecorderActivity extends BaseActivity implements com.yixia.wei
                 com.yixia.weibo.sdk.model.MediaObject$MediaPart part = (MediaObject$MediaPart) mMediaObject.mediaList.get(size - 1);
                 mMediaObject.removePart(part, true);
 
-                if (mMediaObject.mediaList.size() > 0)
+                if (mMediaObject.mediaList.size() > 0) {
                     mMediaObject.mCurrentPart = (MediaObject$MediaPart) mMediaObject.mediaList.get(mMediaObject.mediaList.size() - 1);
-                else
+                } else {
                     mMediaObject.mCurrentPart = null;
+                }
                 return true;
             }
         }
@@ -726,6 +769,7 @@ public class MediaRecorderActivity extends BaseActivity implements com.yixia.wei
                 if (duration == 0) {
                     mCameraSwitch.setVisibility(View.VISIBLE);
                     mRecordDelete.setVisibility(View.GONE);
+                    rgOption.setVisibility(View.VISIBLE);
                 }
                 //视频必须大于3秒
                 if (mTitleNext.getVisibility() != View.INVISIBLE)
